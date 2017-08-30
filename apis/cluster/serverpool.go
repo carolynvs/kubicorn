@@ -33,7 +33,6 @@ type ServerPool struct {
 	Type              string      `json:"type,omitempty"`
 	Name              string      `json:"name,omitempty"`
 	Image             string      `json:"image,omitempty"`
-	ImageVersion string `json:"imageVersion,omitempty"`
 	Size              string      `json:"size,omitempty"`
 	SpotPrice         string      `json:"spotPrice,omitempty"`
 	BootstrapScripts  []string    `json:"bootstrapScripts,omitempty"`
