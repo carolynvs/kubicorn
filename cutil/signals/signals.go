@@ -49,10 +49,12 @@ type Handler struct {
 	signals chan os.Signal
 	// signalReceived is used to store signal handler state.
 	signalReceived int
+	// exitOnTimeout is used to enable or disable if the signal handler should exit on a timeout
+	exitOnTimeout bool
 }
 
 // NewSignalHandler creates a new Handler using given properties.
-func NewSignalHandler(timeoutSeconds int) *Handler {
+func NewSignalHandler(timeoutSeconds int, exitOnTimeout bool) *Handler {
 	signals := make(chan os.Signal)
 	signal.Notify(signals, os.Interrupt, os.Kill)
 	return &Handler{
@@ -81,6 +83,7 @@ func (h *Handler) Register() {
 						continue
 					}
 					h.signalReceived = signalTerminate
+					logger.Critical("Termination received. Force closing kubicorn!")
 					debug.PrintStack()
 					os.Exit(130)
 					break
@@ -89,11 +92,15 @@ func (h *Handler) Register() {
 					break
 				case s == syscall.SIGTERM:
 					h.signalReceived = signalTerminate
+					logger.Critical("Termination received. Force closing kubicorn!")
 					os.Exit(3)
 					break
 				}
 			case <-time.After(time.Duration(h.timeoutSeconds) * time.Second):
-				os.Exit(4)
+				if h.exitOnTimeout {
+					logger.Critical("Timeout of [%d] seconds has elapsed. Force closing kubicorn!", h.timeoutSeconds)
+					os.Exit(4)
+				}
 				break
 			}
 		}
