@@ -101,6 +101,7 @@ func (h *Handler) Register() {
 					logger.Critical("Timeout of [%d] seconds has elapsed. Force closing kubicorn!", h.timeoutSeconds)
 					os.Exit(4)
 				}
+				logger.Debug("..")
 				break
 			}
 		}
